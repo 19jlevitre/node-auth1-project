@@ -1,5 +1,5 @@
 const User = require('.././users/users-model.js')
-
+const bcrypt = require('bcryptjs');
 function restricted(req,res, next) {
   if(req.session.user) {
     next()
@@ -21,9 +21,13 @@ async function checkUsernameFree(req, res, next) {
 }
 
 async function checkUsernameExists(req, res, next) {
-  const { username } = req.body
+  const { username, password } = req.body
   const [user] = await User.findBy({ username })
+  
   if (!user) {
+    next({ status: 401, message: "Invalid credentials"})
+  }
+  else if(!bcrypt.compareSync(password, user.password)){
     next({ status: 401, message: "Invalid credentials"})
   }else {
     next()
