@@ -1,9 +1,9 @@
 const express = require("express");
 const helmet = require("helmet");
 const cors = require("cors");
-const session = require('express-session')
-const Store = require('connect-session-knex')(session)
-
+const session = require('express-session');
+const Store = require('connect-session-knex')(session);
+const authRouter = require('../api/auth/auth-router.js');
 const server = express();
 
 server.use(helmet());
@@ -27,6 +27,8 @@ server.use(session({
     clearInterval: 1000 * 60 * 60,
   })
 }))
+
+server.use('/api/auth', authRouter);
 
 server.get("/", (req, res) => {
   res.json({ api: "up" });
