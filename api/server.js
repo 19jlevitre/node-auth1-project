@@ -4,6 +4,7 @@ const cors = require("cors");
 const session = require('express-session');
 const Store = require('connect-session-knex')(session);
 const authRouter = require('../api/auth/auth-router.js');
+const userRouter = require('../api/users/users-router.js');
 const server = express();
 
 server.use(helmet());
@@ -29,6 +30,8 @@ server.use(session({
 }))
 
 server.use('/api/auth', authRouter);
+server.use('/api/users', userRouter);
+
 
 server.get("/", (req, res) => {
   res.json({ api: "up" });

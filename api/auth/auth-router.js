@@ -4,7 +4,6 @@ const router = require('express').Router()
 const bcrypt = require('bcryptjs')
 const User = require('../users/users-model')
 const {
-  restricted,
   checkPasswordLength,
   checkUsernameExists,
   checkUsernameFree,
@@ -22,20 +21,29 @@ router.post('/register', checkPasswordLength, checkUsernameFree, async (req,res,
   }
 })
 
-router.post('/login', async (req,res,next)=> {
+router.post('/login', checkUsernameExists, async (req,res,next)=> {
   try{
-
+    const {username} = req.body
+    const [user] = await User.findBy({ username })
+    req.session.user = user
+    res.json({ status: 200, message: `welcome ${user.username}`})
   }catch(err) {
     next(err)
   }
 })
 
 router.get('/logout', async (req,res,next)=> {
-  try{
-
-  }catch(err) {
-    next(err)
+  if(!req.session.user) {
+    return res.status(200).json({message: 'no session' })
+  }else {
+    req.session.destroy((err) => {
+      console.log(err)
+    })
+     return res.status(200).json({message: "logged out"}) 
   }
+  
+  
+
 })
 
 module.exports = router
